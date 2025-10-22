@@ -23,11 +23,13 @@ scrape_configs:
 
 # MySQL Exporter
   - job_name: 'mysql-cms'
+    scrape_interval: 5s
     static_configs:
       - targets: ['192.168.1.13:9104']
 
 # NGINX Exporter
   - job_name: "nginx_exporter"
+    scrape_interval: 5s
     static_configs:
       - targets: ["192.168.1.13:9113"]
 

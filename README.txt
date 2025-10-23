@@ -11,7 +11,7 @@
 Сервер 192.168.1.13:
 1.Установил ubuntu-24.04.2-live-server-amd64
 2.Подготовка сервера
-3.Установка CMS (WordPress + NGINX + PHP + MySQL)
+3.Установка CMS WordPress на стек LEMP(NGINX + PHP + MySQL)
 4.Установка Node Exporter
 5.Установка MySQL Server Exporter
 6.Установка NGINX exporter

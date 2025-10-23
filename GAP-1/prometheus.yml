@@ -2,20 +2,23 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
+# Экспортеры сервера 192.168.1.12
 
-# Node Exporter
+# Prometheus
   - job_name: 'prometheus_master'
     scrape_interval: 5s
     static_configs:
       - targets: ['192.168.1.12:9090']
 
-# Node Exporter
+# Node Exporter 192.168.1.12
   - job_name: 'node_exporter_centos'
     scrape_interval: 5s
     static_configs:
       - targets: ['192.168.1.12:9100']
 
-# Node Exporter
+# Экспортеры сервера 192.168.1.13
+
+# Node Exporter 192.168.1.13
   - job_name: 'node_exporter_ubuntu'
     scrape_interval: 5s
     static_configs:

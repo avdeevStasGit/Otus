@@ -1,0 +1,110 @@
+groups:
+  - name: red_method_nginx
+    rules:
+
+# WARNING
+
+
+
+      # 1. RATE - количество запросов в секунду
+      - alert: NginxHighRequestRate
+        expr: |
+          rate(nginx_http_requests_total[2m]) > 500
+        for: 3m
+        labels:
+          severity: warning
+          team: "monitoring"
+          service: "nginx"
+        annotations:
+          summary: "Высокая нагрузка на Nginx {{ $labels.instance }}"
+          description: |
+            RATE (Скорость): Более 500 запросов в секунду
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Virtual Host: {{ $labels.host }}
+            • Текущая скорость: {{ $value | humanize }} запросов/сек
+            • Метод: {{ $labels.method }}
+            • Статус: {{ $labels.status }}
+            
+            Действия:
+            • Ждем.
+            
+            Высокий RATE указывает на пиковую нагрузку или потенциальную DDoS-атаку.
+
+# CRITICAL
+
+
+
+      # 2. ERRORS - количество ошибок
+      - alert: NginxHighErrorRate
+        expr: |
+          rate(nginx_http_requests_total{status=~"5.."}[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "nginx"
+        annotations:
+          summary: "Высокий уровень 5xx ошибок в Nginx {{ $labels.instance }}"
+          description: |
+            ERRORS (Ошибки): Более 10 ошибок 5xx в секунду
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Virtual Host: {{ $labels.host }}
+            • Скорость ошибок: {{ $value | humanize }} errors/сек
+            • Код ошибки: {{ $labels.status }}
+            
+            Действия:
+            • Звонить Петрову: 8904......
+            
+            Высокий уровень ошибок указывает на проблемы с бэкендом или конфигурацией.
+
+      - alert: NginxDown
+        expr: nginx_up == 0 
+        for: 1s
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "nginx"
+        annotations:
+          summary: "Nginx недоступен {{ $labels.instance }}"
+          description: |
+            Nginx exporter не отвечает или метрики недоступны более 2 минут
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Job: {{ $labels.job }}
+            Действия:
+            • Немедленно проверить сервис nginx
+            • Звонить Петрову: 8904......
+            runbook_url: "https://sinara.com/wiki/"
+
+
+# WARNING
+
+
+      # 3. DURATION - время обработки запросов
+      - alert: NginxHighResponseTime
+        expr: |
+          histogram_quantile(0.95, rate(nginx_http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: "monitoring"
+          service: "nginx"
+        annotations:
+          summary: "Высокая задержка ответов Nginx {{ $labels.instance }}"
+          description: |
+            DURATION (Длительность): 95-й процентиль > 2 секунды
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Virtual Host: {{ $labels.host }}
+            • 95-й процентиль: {{ $value | humanize }} секунд
+            • Метод: {{ $labels.method }}
+            
+            Действия:
+            • Наблюдаем.
+            
+            Высокая DURATION указывает на проблемы с бэкендом или нехватку ресурсов.

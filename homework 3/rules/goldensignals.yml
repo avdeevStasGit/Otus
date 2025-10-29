@@ -1,0 +1,108 @@
+groups:
+  - name: golden_signals_php_fpm
+    rules:
+      # WARNING
+      # 1. LATENCY - время обработки запросов
+      - alert: PHPFPMHighLatency
+        expr: |
+          histogram_quantile(0.95, rate(php_fpm_request_duration_seconds_bucket[5m])) > 3
+        for: 5m
+        labels:
+          severity: warning
+          team: "monitoring"
+          service: "php-fpm"
+        annotations:
+          summary: "Высокая задержка PHP-FPM на {{ $labels.instance }}"
+          description: |
+            LATENCY (Задержка): 95-й процентиль > 3 секунды
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Pool: {{ $labels.pool }}
+            • 95-й процентиль: {{ $value | humanize }} секунд
+            • Скрипт: {{ $labels.script }}
+            
+            Действия:
+            • Ждем.
+            
+            Высокая задержка указывает на медленное выполнение PHP-скриптов
+            или нехватку ресурсов.
+
+      # 2. TRAFFIC - объем запросов
+      - alert: PHPFPMHighTraffic
+        expr: |
+          rate(php_fpm_requests_total[2m]) > 200
+        for: 3m
+        labels:
+          severity: warning
+          team: "monitoring"
+          service: "php-fpm"
+        annotations:
+          summary: "Высокий трафик PHP-FPM на {{ $labels.instance }}"
+          description: |
+            TRAFFIC (Трафик): Более 200 запросов в секунду
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Pool: {{ $labels.pool }}
+            • Текущий трафик: {{ $value | humanize }} запросов/сек
+            • Активные процессы: {{ $labels.active_processes }}
+            
+            Действия:
+            • Не требуются.
+            
+            Высокий трафик может привести к исчерпанию воркеров
+            и увеличению задержки.
+
+      # CRITICAL
+      # 3. ERRORS - количество ошибок
+      - alert: PHPFPMHighErrorRate
+        expr: |
+          rate(php_fpm_requests_total{status=~"5.."}[5m]) > 5
+        for: 2m
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "php-fpm"
+        annotations:
+          summary: "Высокий уровень ошибок PHP-FPM на {{ $labels.instance }}"
+          description: |
+            ERRORS (Ошибки): Более 5 ошибок в секунду
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Pool: {{ $labels.pool }}
+            • Скорость ошибок: {{ $value | humanize }} errors/сек
+            • Код ошибки: {{ $labels.status }}
+            
+            Действия:
+            • Звонить Петрову: 89655.....
+            
+            Ошибки могут быть вызваны проблемами с кодом,
+            базой данных или внешними сервисами.
+
+      # 4. SATURATION - степень загрузки
+      - alert: PHPFPMHighSaturation
+        expr: |
+          php_fpm_processes_active / php_fpm_processes_max * 100 > 80
+        for: 3m
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "php-fpm"
+        annotations:
+          summary: "Высокая насыщенность PHP-FPM на {{ $labels.instance }}"
+          description: |
+            SATURATION (Насыщение): Использовано > 80% воркеров
+            
+            Детали:
+            • Сервер: {{ $labels.instance }}
+            • Pool: {{ $labels.pool }}
+            • Активные/Макс: {{ $labels.active_processes }}/{{ $labels.max_children }}
+            • Использование: {{ $value | humanize }}%
+            
+            Действия:
+            • Звонить Иванову: 78956.....
+            
+            Высокая насыщенность означает, что сервис близок
+            к пределу своей производительности.

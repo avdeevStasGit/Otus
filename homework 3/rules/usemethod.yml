@@ -1,0 +1,80 @@
+groups:
+  - name: use_method
+    rules:
+      # Warning
+      # 1. UTILIZATION - % загрузки ресурса
+      - alert: HighDiskIOUtilization
+        expr: |
+          (
+            rate(node_disk_read_bytes_total{device=~"sd.*|nvme.*"}[5m]) 
+            + rate(node_disk_written_bytes_total{device=~"sd.*|nvme.*"}[5m])
+          ) / 125000000 * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: "monitoring"
+          service: "infra"
+        annotations:
+          summary: "Высокая утилизация диска {{ $labels.device }} ({{ $labels.instance }})"
+          description: |
+            UTILIZATION (Использование): Загрузка диска > 80%
+            
+            Детали:
+            • Устройство: {{ $labels.device }}
+            • Сервер: {{ $labels.instance }}
+            • Текущая загрузка: {{ $value | humanize }}%
+            • Предел SATA SSD: ~125 MB/s
+            
+            Действия:
+            • Не требуются
+            
+            Использование показывает насколько интенсивно используется ресурс.
+
+      # Critical
+      # 2. SATURATION - Уровень перегрузки (очередь)
+      - alert: HighDiskIOSaturation
+        expr: |
+          rate(node_disk_io_time_weighted_seconds_total[5m]) > 0.8
+        for: 3m
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "infra"
+        annotations:
+          summary: "Высокая насыщенность диска {{ $labels.device }} ({{ $labels.instance }})"
+          description: |
+            SATURATION (Насыщение): Диск перегружен - большая очередь запросов
+            
+            Детали:
+            • Устройство: {{ $labels.device }}
+            • Сервер: {{ $labels.instance }}
+            • Уровень насыщения: {{ $value | humanize }} (0.8 = 80% времени занято)
+            
+            Действия:
+            • Звонить Иванову: 8900......
+            
+            Насыщение показывает длину очереди - сколько запросов ждут обработки.
+
+      # 3. ERRORS - Количество ошибок
+      - alert: DiskIOErrors
+        expr: |
+          rate(node_disk_io_error_total[5m]) > 0
+        for: 2m
+        labels:
+          severity: critical
+          team: "monitoring"
+          service: "infra"
+        annotations:
+          summary: "Ошибки ввода-вывода на диске {{ $labels.device }} ({{ $labels.instance }})"
+          description: |
+            ERRORS (Ошибки): Обнаружены ошибки диска!
+            
+            Детали:
+            • Устройство: {{ $labels.device }}
+            • Сервер: {{ $labels.instance }}
+            • Скорость ошибок: {{ $value | humanize }} errors/s
+            
+            Действия: 
+            • Звонить Петрову: 8967.......
+            
+            Ошибки указывают на проблемы с оборудованием или драйверами.

@@ -39,3 +39,13 @@
 2. Настроил алертинг на emails
 3. Создал набор alert`ов с различными Severity(warning и critical)
 4. Alertmanager отправляет алерты с severity critical в один канал оповещений, в то время как алерты с severity warning в другой;
+
+
+----------------------------------------------------------------------------------------
+Домашнее задание 4.
+Задание в папке GAP-2.
+1. Установил и настроил grafana.
+2. Через UI графаны создал папки и дашборды.
+3. Добавил Prometheus в качестве datasource.
+4. Настроил дашборды с сайта https://grafana.com/grafana/dashboards для infra и app папок.
+5. Создал DrillDown dashboard

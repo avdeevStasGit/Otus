@@ -1,0 +1,86 @@
+version: '3.5'
+
+services:
+  zabbix-db:
+    image: mysql:8.0
+    container_name: zabbix-db
+    restart: unless-stopped
+    command: 
+          - --character-set-server=utf8mb4
+          - --collation-server=utf8mb4_bin
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password123
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password123
+    volumes:
+      - zabbix_db:/var/lib/mysql
+    networks:
+      - zabbix-net
+
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:latest
+    container_name: zabbix-server
+    restart: unless-stopped
+    ports:
+      - "10051:10051"
+    environment:
+      - DB_SERVER_HOST=zabbix-db
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password123
+      - MYSQL_ROOT_PASSWORD=root_password123
+    volumes:
+      - zabbix_export:/var/lib/zabbix/export
+      - zabbix_snmptraps:/var/lib/zabbix/snmptraps
+    depends_on:
+      - zabbix-db
+    networks:
+      - zabbix-net
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:latest
+    container_name: zabbix-web
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SERVER_HOST=zabbix-db
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=password123
+      - ZBX_SERVER_HOST=zabbix-server
+      - PHP_TZ=Europe/Moscow
+    volumes:
+      - zabbix_www:/usr/share/zabbix
+    depends_on:
+      - zabbix-server
+      - zabbix-db
+    networks:
+      - zabbix-net
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent2:latest
+    container_name: zabbix-agent
+    restart: unless-stopped
+    privileged: true
+    environment:
+      - ZBX_SERVER_HOST=zabbix-server
+      - ZBX_HOSTNAME=otus-docker-agent
+    volumes:
+      - ./agent-scripts:/scripts
+    networks:
+      - zabbix-net
+
+
+volumes:
+  zabbix_db:
+  zabbix_www:
+  zabbix_export:
+  zabbix_snmptraps:
+
+networks:
+  zabbix-net:
+    driver: bridge
+
+

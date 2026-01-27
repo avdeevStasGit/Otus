@@ -50,3 +50,12 @@
 3. Добавил Prometheus в качестве datasource.
 4. Настроил дашборды с сайта https://grafana.com/grafana/dashboards для infra и app папок.
 5. Создал DrillDown dashboard
+----------------------------------------------------------------------------------------
+Домашнее задание 5.
+Задание в папке homework 4.
+
+1. Развернут Zabbix Server, Zabbix Web и база данных MySQL в Docker-контейнерах.
+2. Создал скрипт генерации метрик(otus_metrics.py).
+3. Настроил Zabbix Agent2 на хосте.
+4. Настройка LLD в веб-интерфейсе Zabbix.
+5. Настройка Telegram-оповещений

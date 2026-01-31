@@ -1,0 +1,7 @@
+stream
+  |from()
+    .measurement('mem')
+  |alert()
+    .crit(lambda: "used_percent" > 90)
+    .log('/tmp/ram_alert.log')
+

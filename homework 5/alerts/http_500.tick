@@ -1,0 +1,6 @@
+stream
+  |from()
+    .measurement('http_response')
+  |alert()
+    .crit(lambda: "status_code" == 500)
+    .log('/tmp/http_500.log')

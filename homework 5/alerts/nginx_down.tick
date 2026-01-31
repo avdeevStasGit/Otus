@@ -1,0 +1,6 @@
+stream
+  |from()
+    .measurement('nginx')
+  |alert()
+    .crit(lambda: "active" == 0)
+    .log('/tmp/nginx_down.log')

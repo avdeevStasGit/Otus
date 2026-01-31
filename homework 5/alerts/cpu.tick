@@ -1,0 +1,7 @@
+stream
+  |from()
+    .measurement('cpu')
+    .where(lambda: "cpu" == 'cpu-total')
+  |alert()
+    .crit(lambda: "usage_idle" < 10)
+    .log('/tmp/cpu_alert.log')

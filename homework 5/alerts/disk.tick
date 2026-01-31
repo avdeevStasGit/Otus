@@ -1,0 +1,7 @@
+stream
+  |from()
+    .measurement('disk')
+    .where(lambda: "path" == '/')
+  |alert()
+    .crit(lambda: "used_percent" > 85)
+    .log('/tmp/disk_alert.log')

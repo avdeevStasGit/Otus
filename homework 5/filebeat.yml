@@ -1,4 +1,3 @@
-# Filebeat Configuration
 filebeat.inputs:
 - type: log
   enabled: true
@@ -31,17 +30,14 @@ filebeat.inputs:
     environment: production
   fields_under_root: true
 
-# Output to Elasticsearch on VM2
 output.elasticsearch:
-  hosts: ["192.168.1.11:9200"]  # IP VM2
+  hosts: ["192.168.1.11:9200"]
   indices:
-    - index: "filebeat-%{[service]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+    - index:
 
-# Kibana setup
 setup.kibana:
-  host: "192.168.1.11:5601"  # IP VM2
+  host: "192.168.1.11:5601"
 
-# Logging - пишем в stdout вместо файла
 logging.level: info
 logging.to_files: false
 logging.to_syslog: false

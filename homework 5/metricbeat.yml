@@ -1,4 +1,3 @@
-# Metricbeat Configuration
 metricbeat.modules:
 - module: system
   metricsets:

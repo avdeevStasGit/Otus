@@ -1,0 +1,48 @@
+# Filebeat Configuration
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/*.log
+    - /var/log/nginx/access.log
+    - /var/log/nginx/error.log
+  fields:
+    service: nginx
+    environment: production
+  fields_under_root: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/php*.log
+    - /var/log/php-fpm.log
+  fields:
+    service: php-fpm
+    environment: production
+  fields_under_root: true
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/mysql/*.log
+    - /var/log/mysql/error.log
+  fields:
+    service: mysql
+    environment: production
+  fields_under_root: true
+
+# Output to Elasticsearch on VM2
+output.elasticsearch:
+  hosts: ["192.168.1.11:9200"]  # IP VM2
+  indices:
+    - index: "filebeat-%{[service]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+# Kibana setup
+setup.kibana:
+  host: "192.168.1.11:5601"  # IP VM2
+
+# Logging - пишем в stdout вместо файла
+logging.level: info
+logging.to_files: false
+logging.to_syslog: false
+logging.metrics.enabled: false

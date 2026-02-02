@@ -1,0 +1,22 @@
+heartbeat.monitors:
+- type: http
+  urls: ["http://192.168.1.13:80"]
+  schedule: '@every 10s'
+  timeout: 5s
+  check.response.status: [200]
+  name: "cms-web-check"
+
+- type: tcp
+  hosts: ["192.168.1.13:3306"]
+  schedule: '@every 10s'
+  timeout: 5s
+  mode: any
+  name: "database-port-check"
+
+output.elasticsearch:
+  hosts: ["192.168.1.11:9200"]
+  indices:
+    - index: "heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+
+setup.kibana:
+  host: "192.168.1.11:5601"

@@ -1,0 +1,12 @@
+sources:
+  syslog_source:
+    type: file
+    include: ["/var/log/syslog", "/var/log/auth.log"]
+    start_at_beginning: true
+
+sinks:
+  elastic:
+    type: elasticsearch
+    inputs: ["syslog_source"]
+    endpoint: "http://192.168.1.11:9200"
+    index: "syslog-%Y.%m.%d"

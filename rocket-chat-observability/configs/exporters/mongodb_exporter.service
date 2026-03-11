@@ -1,0 +1,13 @@
+[Unit]
+Description=MongoDB Exporter
+After=network.target
+
+[Service]
+User=root
+Type=simple
+Environment="MONGODB_URI=mongodb://mongodb_exporter:secure_password@localhost:27017/admin?authSource=admin&ssl=false"
+ExecStart=/usr/local/bin/mongodb_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+{{ define "telegram.default.message" }}
+{{- if eq .Status "firing" }}🔥 <b>FIRING</b>{{ else }}✅ <b>RESOLVED</b>{{ end }}
+{{- range .Alerts }}
+<b>Alert:</b> {{ .Annotations.summary }}
+<b>Description:</b> {{ .Annotations.description }}
+<b>Severity:</b> {{ .Labels.severity | toUpper }}
+<b>Instance:</b> {{ .Labels.instance }}
+<b>Started:</b> {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+{{- if ne .Status "firing" }}
+<b>Ended:</b> {{ .EndsAt.Format "2006-01-02 15:04:05" }}
+{{- end }}
+{{- end }}
+{{ end }}

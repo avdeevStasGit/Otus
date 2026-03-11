@@ -1,0 +1,38 @@
+global:
+  resolve_timeout: 10s
+
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+route:
+  group_by: ['alertname', 'instance']
+  group_wait: 10s
+  group_interval: 15s
+  receiver: "telegram-default"
+  routes:
+    - receiver: "telegram-default"
+      match_re:
+        severity: critical|warning
+      continue: true
+    - receiver: "telegram-critical"
+      match:
+        severity: critical
+      continue: true
+
+receivers:
+  - name: "telegram-default"
+    telegram_configs:
+      - bot_token: "8480744808:AAEYc9tv-UnBf2SLFxJgF1dbz3VbJJUl3VQ"
+        chat_id: -5243406732
+        send_resolved: true
+        parse_mode: "HTML"
+        disable_notifications: false
+        message: '{{ template "telegram.default.message" . }}'
+
+  - name: "telegram-critical"
+    telegram_configs:
+      - bot_token: "8480744808:AAEYc9tv-UnBf2SLFxJgF1dbz3VbJJUl3VQ"
+        chat_id: -5233240005
+        send_resolved: true
+        parse_mode: "HTML"
+        message: '{{ template "telegram.default.message" . }}'

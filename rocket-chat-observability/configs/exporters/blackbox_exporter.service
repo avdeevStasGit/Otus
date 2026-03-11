@@ -1,0 +1,14 @@
+[Unit]  
+Description=Blackbox Exporter Service  
+After=network.target  
+  
+[Service]  
+User=blackbox  
+Group=blackbox  
+Type=simple  
+ExecStart=/usr/local/bin/blackbox_exporter --config.file=/etc/blackbox/blackbox.yml  
+ExecReload=/bin/kill -HUP $MAINPID  
+Restart=on-failure  
+  
+[Install]  
+WantedBy=multi-user.target

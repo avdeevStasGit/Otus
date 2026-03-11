@@ -1,0 +1,135 @@
+groups:
+  - name: rocket_chat_alerts
+    interval: 5s
+    rules:
+
+      - alert: RocketChatDown
+        expr: probe_success{instance="http://192.168.1.12:3000", job="blackbox"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: rocket-chat
+        annotations:
+          summary: "Rocket.Chat (порт 3000) недоступен"
+          description: "Сервис не отвечает на порту 3000 более 1 минуты."
+
+      - alert: RocketChatApiDown
+        expr: probe_success{instance="http://192.168.1.12:3000/api/info", job="blackbox"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: rocket-chat-api
+        annotations:
+          summary: "Rocket.Chat API /info недоступен"
+          description: "API /info не отвечает более 1 минуты."
+
+      - alert: NodeExporterDown
+        expr: up{job="node_exporter_ubuntu", instance="192.168.1.12:9100"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: node-exporter
+        annotations:
+          summary: "Node Exporter недоступен"
+          description: "Node Exporter на сервере {{ $labels.instance }} не отвечает."
+
+      - alert: MongoDBExporterDown
+        expr: mongodb_up == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: mongodb-exporter
+        annotations:
+          summary: "MongoDB Exporter недоступен"
+          description: "MongoDB Exporter не может подключиться к БД или сам не отвечает."
+
+      - alert: BlackboxExporterDown
+        expr: up{job="blackbox_exporter", instance="192.168.1.12:9115"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: blackbox-exporter
+        annotations:
+          summary: "Blackbox Exporter недоступен"
+          description: "Blackbox Exporter на {{ $labels.instance }} не отвечает."
+
+      - alert: PrometheusDown
+        expr: probe_success{instance="http://192.168.1.13:9090", job="blackbox"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          component: prometheus
+        annotations:
+          summary: "Prometheus недоступен"
+          description: "Prometheus на {{ $labels.instance }} не отвечает более 1 минуты."
+
+
+      - alert: HighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle", instance="192.168.1.12:9100"}[5m])) * 100) > 80
+        for: 10s
+        labels:
+          severity: warning
+          component: server
+        annotations:
+          summary: "Высокая загрузка CPU ({{ $value }}%)"
+          description: "Загрузка CPU превышает 80% более 10 минут."
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 10s
+        labels:
+          severity: warning
+          component: server
+        annotations:
+          summary: "Высокая загрузка памяти ({{ $value }}%)"
+          description: "Использование памяти превышает 80% более 10 минут."
+
+      - alert: HighDiskUsage
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 80
+        for: 10s
+        labels:
+          severity: warning
+          component: server
+        annotations:
+          summary: "Заполнение диска ({{ $value }}%)"
+          description: "Диск / заполнен более чем на 80% в течение 10 минут."
+
+      - alert: RocketChatHighErrorRate
+        expr: (sum(rate(rocketchat_rest_api_count{status=~"5.."}[5m])) / sum(rate(rocketchat_rest_api_count[5m]))) * 100 > 1
+        for: 10s
+        labels:
+          severity: warning
+          component: rocket-chat
+        annotations:
+          summary: "Процент ошибок 5xx превышает 1%"
+          description: "Текущий процент ошибок {{ $value }}% (порог 1%)."
+
+      - alert: RocketChatHighLatency
+        expr: avg_over_time(rocketchat_rest_api{quantile="0.95"}[5m]) > 0.5
+        for: 10s
+        labels:
+          severity: warning
+          component: rocket-chat
+        annotations:
+          summary: "Высокая задержка API (P95 > 1с)"
+          description: "95-й процентиль времени ответа API составляет {{ $value }}с (порог 1с)."
+
+      - alert: MongoDBHighLockRate
+        expr: rate(mongodb_ss_locks_acquireCount[5m]) > 500
+        for: 10s
+        labels:
+          severity: critical
+          component: mongodb
+        annotations:
+          summary: "Высокая частота блокировок MongoDB"
+          description: "Частота захватов блокировок {{ $value }} ops/sec (порог 500)."
+
+      - alert: MongoDBHighMemory
+        expr: mongodb_ss_mem_resident > 200
+        for: 10s
+        labels:
+          severity: warning
+          component: mongodb
+        annotations:
+          summary: "MongoDB потребляет много памяти"
+          description: "Память MongoDB {{ $value }} MB (порог 200 MB)."

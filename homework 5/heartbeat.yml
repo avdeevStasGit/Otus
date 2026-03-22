@@ -1,0 +1,16 @@
+heartbeat.monitors:
+- type: http
+  name: CMS
+  urls: ["http://192.168.1.10"]
+  schedule: '@every 10s'
+  check.response.status: [200]
+
+- type: tcp
+  name: MySQL
+  hosts: ["192.168.1.10:3306"]
+  schedule: '@every 10s'
+
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: "elastic"
+  password: "GvNjrX0MzqZ_QdTE7FgN"

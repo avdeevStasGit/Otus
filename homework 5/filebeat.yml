@@ -1,44 +1,35 @@
 filebeat.inputs:
-- type: log
+- type: filestream
+  id: nginx-access
   enabled: true
   paths:
-    - /var/log/nginx/*.log
     - /var/log/nginx/access.log
+
+- type: filestream
+  id: nginx-error
+  enabled: true
+  paths:
     - /var/log/nginx/error.log
-  fields:
-    service: nginx
-    environment: production
-  fields_under_root: true
 
-- type: log
+- type: filestream
+  id: mysql-error
   enabled: true
   paths:
-    - /var/log/php*.log
-    - /var/log/php-fpm.log
-  fields:
-    service: php-fpm
-    environment: production
-  fields_under_root: true
-
-- type: log
-  enabled: true
-  paths:
-    - /var/log/mysql/*.log
     - /var/log/mysql/error.log
-  fields:
-    service: mysql
-    environment: production
-  fields_under_root: true
+
+- type: filestream
+  id: php-fpm
+  enabled: true
+  paths:
+    - /var/log/php8.3-fpm.log
 
 output.elasticsearch:
-  hosts: ["192.168.1.11:9200"]
-  indices:
-    - index:
+  hosts: ["http://192.168.1.15:9200"]
+  username: "elastic"
+  password: "GvNjrX0MzqZ_QdTE7FgN"
 
 setup.kibana:
-  host: "192.168.1.11:5601"
+  host: "http://192.168.1.15:5601"
+  username: "elastic"
+  password: "GvNjrX0MzqZ_QdTE7FgN"
 
-logging.level: info
-logging.to_files: false
-logging.to_syslog: false
-logging.metrics.enabled: false

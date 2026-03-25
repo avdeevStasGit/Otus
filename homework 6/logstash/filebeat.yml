@@ -1,0 +1,37 @@
+filebeat.inputs:
+- type: filestream
+  id: nginx-access
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+
+- type: filestream
+  id: nginx-error
+  enabled: true
+  paths:
+    - /var/log/nginx/error.log
+
+- type: filestream
+  id: mysql-error
+  enabled: true
+  paths:
+    - /var/log/mysql/error.log
+
+- type: filestream
+  id: php-fpm
+  enabled: true
+  paths:
+    - /var/log/php8.3-fpm.log
+
+#output.elasticsearch:
+#  hosts: ["http://192.168.1.15:9200"]
+#  username: "elastic"
+#  password: "GvNjrX0MzqZ_QdTE7FgN"
+
+output.logstash:
+  hosts: ["192.168.1.15:5044"]
+
+setup.kibana:
+  host: "http://192.168.1.15:5601"
+  username: "elastic"
+  password: "GvNjrX0MzqZ_QdTE7FgN"

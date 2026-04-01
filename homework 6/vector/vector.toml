@@ -1,0 +1,33 @@
+[sources.filebeat]
+type = "logstash"
+address = "0.0.0.0:5044"
+
+[transforms.parse_nginx]
+type = "remap"
+inputs = ["filebeat"]
+source = '''
+parsed = parse_regex!(.message, r'^(?P<clientip>\S+) - - \[(?P<timestamp>[^\]]+)\] "(?P<verb>\S+) (?P<request>\S+) HTTP/(?P<httpversion>\S+)" (?P<response>\d+) (?P<bytes>\d+) "(?P<referrer>[^"]*>
+
+.clientip = parsed.clientip
+.@timestamp = parse_timestamp!(parsed.timestamp, "%d/%b/%Y:%H:%M:%S %z")
+.verb = parsed.verb
+.request = parsed.request
+.httpversion = parsed.httpversion
+.response = parsed.response
+.bytes = parsed.bytes
+.referrer = parsed.referrer
+.agent = parsed.agent
+'''
+
+[sinks.elasticsearch]
+type = "elasticsearch"
+inputs = ["parse_nginx"]
+endpoints = ["http://localhost:9200"]
+
+[sinks.elasticsearch.auth]
+strategy = "basic"
+user = "elastic"
+password = "GvNjrX0MzqZ_QdTE7FgN"
+
+[sinks.elasticsearch.bulk]
+index = "vector-logs-%Y.%m.%d"

@@ -101,7 +101,9 @@ Metricbeat собирает метрики VM, nginx, базы данных.
 Домашнее задание 9.
 Задание в папке homework 8.
 
-1. Заменил Elasticsearch на Grafana Loki.
+1) Заменил filebeat на fluentbeat с аналогичной конфигурацией;
+2) Заменил logstash на datapreper он должен принимать данные от fluentbeat;
+3) Заменил Elasticsearch и Kibana на Opensearch и Opensearch Dashboard.
 
 ----------------------------------------------------------------------------------------
 

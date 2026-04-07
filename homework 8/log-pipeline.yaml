@@ -1,0 +1,18 @@
+log-pipeline:
+  workers: 2
+  delay: 100
+  source:
+    http:
+      port: 2021
+  processor:
+    - grok:
+        match:
+          log: [ "%{COMMONAPACHELOG}" ]
+  sink:
+    - opensearch:
+        hosts: [ "https://localhost:9200" ]
+        username: "admin"
+        password: "2381qsrtyY!"
+        index: "nginx-access-%{yyyy.MM.dd}"
+        ssl: false
+        insecure: true
